@@ -6,6 +6,8 @@ import re
 import logging
 import socket
 
+from socket import timeout
+
 from zope.component import getUtility
 
 from zope.interface import implements
@@ -37,7 +39,7 @@ class VideoAPI(object):
             except urllib2.HTTPError:
                 logger.info("An error ocurred when trying to access %s" % url)
                 data = None
-            except urllib2.URLError:
+            except (urllib2.URLError, timeout):
                 logger.info("Timeout when trying to access %s" % url)
                 data = None
             except socket.timeout:
@@ -59,7 +61,7 @@ class VideoAPI(object):
         if kwargs:
             registry = getUtility(IRegistry)
             records = registry.forInterface(IAPISettings)
-            url_base = records.url_base
+            url_base = self.get_multimedia_url()
             video_api = records.video_api
 
             query_url = "%s%s%s" % (url_base,
@@ -69,6 +71,14 @@ class VideoAPI(object):
             return self.get_json(query_url)
 
         raise ValueError("No arguments supplied")
+
+    def get_multimedia_url(self):
+        registry = getUtility(IRegistry)
+        records = registry.forInterface(IAPISettings)
+
+        url_base = records.url_base
+
+        return url_base
 
     def get_video_widget_url(self, url, width=400, json=None):
         if json:
@@ -179,7 +189,7 @@ class VideoAPI(object):
         registry = getUtility(IRegistry)
         records = registry.forInterface(IAPISettings)
 
-        url_base = records.url_base
+        url_base = self.get_multimedia_url()
         video_api = records.video_api
 
         offset_param = records.offset
@@ -279,7 +289,7 @@ class VideoAPI(object):
         registry = getUtility(IRegistry)
         records = registry.forInterface(IAPISettings)
 
-        url_base = records.url_base
+        url_base = self.get_multimedia_url()
         video_api = records.video_api
 
         base_url = "%s%s" % (url_base, video_api)
@@ -321,7 +331,7 @@ class VideoAPI(object):
         registry = getUtility(IRegistry)
         records = registry.forInterface(IAPISettings)
 
-        url_base = records.url_base
+        url_base = self.get_multimedia_url()
         video_api = records.video_api
 
         base_url = "%s%s" % (url_base, video_api)

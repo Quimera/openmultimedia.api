@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from rwproperty import getproperty
-from rwproperty import setproperty
 
 from zope.component import adapts
 
@@ -50,13 +48,3 @@ class AddableVideos(object):
 
     def __init__(self, context):
         self.context = context
-
-    @getproperty
-    def relatedVideos(self):
-        # Codigo para listar videos ya agregados
-        return []
-
-    @setproperty
-    def relatedVideos(self, value):
-        # Codigo para agregar videos al nitf
-        return []
